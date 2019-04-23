@@ -1,0 +1,11 @@
+.table__rows {
+    display: flex;
+}
+
+.table__rows-body {
+    overflow: hidden;
+}
+
+.table__rows-fixed-column {
+    width: 150px;
+}

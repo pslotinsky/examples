@@ -1,0 +1,17 @@
+.table__cell {
+    box-sizing: border-box;
+
+    width: 150px;
+    height: 40px;
+    padding: 0 20px;
+
+    flex-shrink: 0;
+
+    border-bottom: 1px solid gray;
+
+    line-height: 40px;
+}
+
+.table__cell_fill {
+    width: 100%;
+}

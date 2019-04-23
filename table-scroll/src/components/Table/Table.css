@@ -1,0 +1,8 @@
+.table {
+    display: inline-flex;
+
+    width: 600px;
+    height: 400px;
+
+    flex-direction: column;
+}
