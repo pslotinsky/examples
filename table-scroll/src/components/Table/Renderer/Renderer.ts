@@ -66,8 +66,6 @@ export class Renderer {
         if (this.state.name !== name) {
             this.state = this.createState(name);
             this.state.update();
-            // tslint:disable-next-line:no-console
-            console.log(this.state);
         }
     }
 

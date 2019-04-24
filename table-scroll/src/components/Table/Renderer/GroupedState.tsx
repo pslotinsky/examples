@@ -58,14 +58,19 @@ export class GroupedState extends State {
                 return row;
             });
 
-        const groups = rows.reduce((acc, cur) => {
-            return acc.find(item => item === cur.group) ? acc : [...acc, cur.group];
-        }, []);
+        const groupsRows = rows.reduce((acc, row) => {
+            const { group } = row;
+            const groupRows: Row[] = acc[group.id] || [];
+            return {
+                ...acc,
+                [group.id]: [...groupRows, row]
+            };
+        }, {});
 
-        // tslint:disable-next-line:no-console
-        console.log(groups);
-
-        return groups;
+        return Object.keys(groupsRows).map(key => {
+            const id = Number(key);
+            return new Group(id, groupsRows[key])
+        });
     }
 
 }

@@ -13,6 +13,8 @@ export class Table {
 
     private rows: Row[] = [];
 
+    private groups: Group[] = [];
+
     constructor({ columnNames }: ITableParams) {
         this.columns = this.createColumns(columnNames);
     }
@@ -34,21 +36,29 @@ export class Table {
     }
 
     public getGroups(): Group[] {
-        const groups = [];
-
-        for (let i = 0; i < this.rows.length; i += 5) {
-            groups.push(this.rows.slice(i, i + 5));
-        }
-
-        return groups.map((item, index) => new Group(index, item));
+        return this.groups;
     }
 
     public generateRandomRows(count: number): void {
-        for (let i = 0; i < count; i++) {
-            const row = new Row();
+        let row: Row;
+        let group: Group;
+        let groupRows: Row[] = [];
+
+        for (let i = 1; i <= count; i++) {
+            row = new Row();
             row.generateRandomCells(this.columns.length);
             row.id = i.toString();
+
             this.rows.push(row);
+            groupRows.push(row);
+
+            if (i % 5 === 0) {
+                group = new Group(this.groups.length, groupRows);
+                this.groups.push(group);
+
+                groupRows.forEach(item => item.group = group);
+                groupRows = [];
+            }
         }
     }
 

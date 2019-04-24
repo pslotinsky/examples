@@ -12,6 +12,7 @@ export interface IPage {
     break: number;
     end: number;
     offset: number;
+    size: number;
 }
 
 export class Scroller {
@@ -41,9 +42,10 @@ export class Scroller {
     }
 
     public inc(): void {
-        if (this.offset < this.calculateSize() - this.calculateClientSize()) {
+        if (this.offset < this.size - this.calculateClientSize()) {
+            const delta = this.calculateDelta(this.index);
+            this.offset += delta;
             this.index++;
-            this.offset += this.calculateDelta(this.index);
 
             this.scrollTo(this.rootRef.current!, this.offset);
 
@@ -57,7 +59,8 @@ export class Scroller {
     public dec(): void {
         if (this.offset > 0) {
             this.index--;
-            this.offset -= this.calculateDelta(this.index);
+            const delta = this.calculateDelta(this.index);
+            this.offset -= delta;
 
             this.scrollTo(this.rootRef.current!, this.offset);
 
@@ -113,10 +116,9 @@ export class Scroller {
         const deltas = this.calculateDeltas();
         const length = deltas.length;
         let size = 0;
-        let offset = 0;
         let page: Partial<IPage> = {
             index: 0,
-            offset,
+            offset: 0,
             start: 0
         };
         let previousPage: IPage;
@@ -127,11 +129,10 @@ export class Scroller {
                 previousPage = page as IPage;
                 pages.push(previousPage);
 
-                offset += size;
                 page = {
                     index: previousPage.index + 1,
-                    offset,
-                    start: i + 1
+                    offset: deltas.slice(0, i + 1).reduce((acc, cur) => acc + cur),
+                    start: i + 1,
                 };
 
                 size = 0;
