@@ -5,7 +5,7 @@ import { Row } from '@models/Row';
 
 import { Scroller, XScrollerGrouped, YScrollerGrouped } from '../Scroller';
 import { TableGroup } from '../TableGroup';
-import { State, StateName } from './State';
+import { IStateParams, State, StateName } from './State';
 
 
 const ROW_HEIGHT = 40;
@@ -14,6 +14,20 @@ const GROUP_PADDING = 40;
 export class GroupedState extends State {
 
     public name: StateName = StateName.Grouped;
+
+    protected scrollerX: XScrollerGrouped;
+
+    protected scrollerY: YScrollerGrouped;
+
+    constructor({ onPageChanged, ...params }: IStateParams) {
+        super({
+            ...params,
+            onPageChanged: () => {
+                onPageChanged();
+                this.scrollerX.updateOffset();
+            }
+        });
+    }
 
     public render(): JSX.Element {
         return this.scrollerY.render(
@@ -34,6 +48,7 @@ export class GroupedState extends State {
     protected createScrollerX(): Scroller {
         return new XScrollerGrouped({
             model: this.model,
+            onPageChanged: this.onPageChanged,
             rootRef: this.rootRef
         });
     }
@@ -41,6 +56,7 @@ export class GroupedState extends State {
     protected createScrollerY(): Scroller {
         return new YScrollerGrouped({
             model: this.model,
+            onPageChanged: this.onPageChanged,
             rootRef: this.rootRef
         });
     }

@@ -1,11 +1,12 @@
 import { Table as TableModel } from '@models/Table';
 
-import { Scroller } from '../Scroller';
+import { PageChangedHandler, Scroller } from '../Scroller';
 
 
-interface IParams {
+export interface IStateParams {
     model: TableModel;
     rootRef: React.RefObject<HTMLDivElement>;
+    onPageChanged: PageChangedHandler;
 }
 
 export enum StateName {
@@ -31,12 +32,16 @@ export class State {
 
     protected scrollerY: Scroller;
 
+    protected onPageChanged: PageChangedHandler;
+
     constructor({
         model,
-        rootRef
-    }: IParams) {
+        rootRef,
+        onPageChanged,
+    }: IStateParams) {
         this.model = model;
         this.rootRef = rootRef;
+        this.onPageChanged = onPageChanged;
         this.scrollerX = this.createScrollerX();
         this.scrollerY = this.createScrollerY();
     }
@@ -60,10 +65,6 @@ export class State {
 
     public scrollDown(): void {
         this.scrollerY.inc();
-    }
-
-    public isPageChanged(): boolean {
-        return (this.scrollerX.isPageChanged() || this.scrollerY.isPageChanged());
     }
 
     public render(): JSX.Element {

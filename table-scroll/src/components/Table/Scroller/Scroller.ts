@@ -4,6 +4,7 @@ import { Table } from '@models/Table';
 interface IParams {
     model: Table;
     rootRef: React.RefObject<HTMLDivElement>;
+    onPageChanged: PageChangedHandler;
 }
 
 export interface IPage {
@@ -14,6 +15,8 @@ export interface IPage {
     offset: number;
     size: number;
 }
+
+export type PageChangedHandler = () => void;
 
 export class Scroller {
 
@@ -31,13 +34,14 @@ export class Scroller {
 
     protected pageOffset: number = 0;
 
-    protected pageChanged = false;
-
     protected size: number;
 
-    constructor({ model, rootRef }: IParams) {
+    protected onPageChanged: PageChangedHandler;
+
+    constructor({ model, rootRef, onPageChanged }: IParams) {
         this.model = model;
         this.rootRef = rootRef;
+        this.onPageChanged = onPageChanged;
         this.size = this.calculateSize();
     }
 
@@ -50,8 +54,8 @@ export class Scroller {
             this.scrollTo(this.rootRef.current!, this.offset);
 
             if (this.index > this.page.break) {
-                this.pageChanged = true;
                 this.page = this.pages[this.page.index + 1];
+                this.onPageChanged();
             }
         }
     }
@@ -65,17 +69,15 @@ export class Scroller {
             this.scrollTo(this.rootRef.current!, this.offset);
 
             if (this.index < this.page.start) {
-                this.pageChanged = true;
                 this.page = this.pages[this.page.index - 1];
+                this.onPageChanged();
             }
         }
     }
 
-    public isPageChanged(): boolean {
-        return this.pageChanged;
-    }
-
     public update(): void {
+        this.scrollTo(this.rootRef.current!, this.offset);
+
         this.pages = this.createPages();
         this.page = this.calculatePage();
     }

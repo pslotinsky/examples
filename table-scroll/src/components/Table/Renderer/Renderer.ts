@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { Table } from '@models/Table';
 
+import { PageChangedHandler } from '../Scroller';
 import { GroupedState } from './GroupedState';
 import { PlainState } from './PlainState';
 import { State, StateName } from './State';
@@ -10,6 +11,7 @@ import { State, StateName } from './State';
 interface IParams {
     model: Table;
     rootRef: React.RefObject<HTMLDivElement>;
+    onPageChanged: PageChangedHandler;
 }
 
 export class Renderer {
@@ -20,12 +22,16 @@ export class Renderer {
 
     private rootRef: React.RefObject<HTMLDivElement>;
 
+    private onPageChanged: PageChangedHandler;
+
     constructor({
         model,
-        rootRef
+        rootRef,
+        onPageChanged,
     }: IParams) {
         this.model = model;
         this.rootRef = rootRef;
+        this.onPageChanged = onPageChanged;
         this.state = this.createState(StateName.Plain);
     }
 
@@ -54,10 +60,6 @@ export class Renderer {
         this.state.scrollDown();
     }
 
-    public isPageChanged(): boolean {
-        return this.state.isPageChanged();
-    }
-
     public render(): React.ReactNode {
         return this.state.render();
     }
@@ -77,7 +79,8 @@ export class Renderer {
 
         return new ctors[name]({
             model: this.model,
-            rootRef: this.rootRef
+            onPageChanged: this.onPageChanged,
+            rootRef: this.rootRef,
         });
     }
 

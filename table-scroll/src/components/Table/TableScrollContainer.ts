@@ -31,7 +31,8 @@ export class TableScrollContainer extends React.Component<IParams> {
 
         this.renderer = new Renderer({
             model: props.model,
-            rootRef: this.rootRef
+            onPageChanged: this.onPageChanged,
+            rootRef: this.rootRef,
         });
     }
 
@@ -63,10 +64,6 @@ export class TableScrollContainer extends React.Component<IParams> {
         } else {
             (deltaY > 0) ? this.renderer.scrollDown() : this.renderer.scrollUp();
         }
-
-        if (this.renderer.isPageChanged()) {
-            this.forceUpdate();
-        }
     }
 
     @autobind
@@ -85,10 +82,11 @@ export class TableScrollContainer extends React.Component<IParams> {
                 this.renderer.scrollDown();
                 break;
         }
+    }
 
-        if (this.renderer.isPageChanged()) {
-            this.forceUpdate();
-        }
+    @autobind
+    protected onPageChanged(): void {
+        this.forceUpdate();
     }
 
 }

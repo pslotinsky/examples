@@ -20,14 +20,16 @@ export class PlainState extends State {
     protected createScrollerX(): Scroller {
         return new XScroller({
             model: this.model,
-            rootRef: this.rootRef
+            onPageChanged: this.onPageChanged,
+            rootRef: this.rootRef,
         });
     }
 
     protected createScrollerY(): Scroller {
         return new YScroller({
             model: this.model,
-            rootRef: this.rootRef
+            onPageChanged: this.onPageChanged,
+            rootRef: this.rootRef,
         });
     }
 
