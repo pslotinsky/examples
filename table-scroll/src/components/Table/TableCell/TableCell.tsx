@@ -1,19 +1,24 @@
-import * as classNames from 'classnames';
 import * as React from 'react';
 
 import './TableCell.css'
 
+import { Cell } from '@models/Cell';
+
+import { CellContentFactory } from './CellContentFactory';
+
 
 interface IParams {
-    children: React.ReactNode;
+    children?: React.ReactNode;
+    model?: Cell;
     fill?: boolean;
+    width?: number;
 }
 
-export function TableCell({ children, fill }: IParams): JSX.Element {
-    const className = classNames(
-        'table__cell',
-        fill && 'table__cell_fill'
-    );
+const factory = new CellContentFactory();
 
-    return <div className={className}>{children}</div>;
+export function TableCell({ children, model, fill, width }: IParams): JSX.Element {
+    const className = fill ? 'table__cell table__cell_fill' : 'table__cell'
+    const content = children || model && factory.create(model);
+
+    return <div className={className} style={{ width }}>{content}</div>;
 }

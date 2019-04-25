@@ -8,4 +8,8 @@
 
 .table__rows-fixed-column {
     width: 150px;
+
+    box-sizing: border-box;
+
+    border-left: 1px solid gray;
 }

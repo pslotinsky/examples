@@ -1,4 +1,4 @@
-import { Column } from './Column';
+import { Column, DataType } from './Column';
 import { Group } from './Group';
 import { Row } from './Row';
 
@@ -39,14 +39,19 @@ export class Table {
         return this.groups;
     }
 
-    public generateRandomRows(count: number): void {
+    public randomize(rowsCount: number): void {
         let row: Row;
         let group: Group;
         let groupRows: Row[] = [];
 
-        for (let i = 1; i <= count; i++) {
+        for (const column of this.columns) {
+            column.type = this.randomType();
+            column.width = this.randomWidth();
+        }
+
+        for (let i = 1; i <= rowsCount; i++) {
             row = new Row();
-            row.generateRandomCells(this.columns.length);
+            row.generateRandomCells(this.columns);
             row.id = i.toString();
 
             this.rows.push(row);
@@ -65,8 +70,18 @@ export class Table {
     private createColumns(names: string[]): Column[] {
         return names.map((name, index) => new Column({
             id: index.toString(),
-            name
+            name,
         }));
+    }
+
+    private randomType(): DataType {
+        const types = [DataType.Number, DataType.String, DataType.Date, DataType.Money];
+        const index = Math.round((types.length - 1) * Math.random());
+        return types[index];
+    }
+
+    private randomWidth(): number {
+        return Math.round(3 * Math.random() + 2) * 50;
     }
 
 }

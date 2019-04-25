@@ -15,7 +15,7 @@ interface IParams {
 }
 
 export function TableRows({ model, scroller }: IParams): JSX.Element {
-    const rows = model.map(row => <TableRow key={row.id} model={row} />);
+    const rows = model.map((row, index) => <TableRow key={row.id} model={row} index={index} />);
 
     return (
         <div className="table__rows">
@@ -23,8 +23,8 @@ export function TableRows({ model, scroller }: IParams): JSX.Element {
                 {scroller ? scroller.render(rows) : rows }
             </div>
             <div className="table__rows-fixed-column">
-                {model.map(row => (
-                    <TableRow key={row.id}>
+                {model.map((row, index) => (
+                    <TableRow key={row.id} index={index}>
                         <TableCell>{row.id}</TableCell>
                     </TableRow>
                 ))}

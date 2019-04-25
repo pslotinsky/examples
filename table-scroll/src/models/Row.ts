@@ -1,4 +1,5 @@
 import { Cell } from './Cell';
+import { Column, DataType } from './Column';
 import { Group } from './Group';
 
 
@@ -20,14 +21,15 @@ export class Row {
         return this.cells[index];
     }
 
-    public generateRandomCells(count: number): void {
-        for (let i = 0; i < count; i++) {
-            const cell = new Cell({
-                id: i.toString(),
-                name: Math.round(Math.random() * 100).toString()
-            });
-            this.cells.push(cell);
-        }
+    public generateRandomCells(columns: Column[]): void {
+        this.cells = columns.map((column, index) => {
+            const id = index.toString();
+            const name = (column.type === DataType.Date)
+                ? Date.now().toString()
+                : Math.round(Math.random() * 100).toString();
+
+            return new Cell({ id, name, column });
+        });
     }
 
     public isLast(): boolean {

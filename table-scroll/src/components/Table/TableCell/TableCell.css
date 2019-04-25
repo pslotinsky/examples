@@ -1,4 +1,6 @@
 .table__cell {
+    overflow: hidden;
+
     box-sizing: border-box;
 
     width: 150px;
@@ -7,11 +9,29 @@
 
     flex-shrink: 0;
 
+    border-left: 1px solid gray;
     border-bottom: 1px solid gray;
+    text-overflow: ellipsis;
 
     line-height: 40px;
 }
 
+.table__cell:first-child {
+    border-left: none
+}
+
 .table__cell_fill {
     width: 100%;
+}
+
+.table__row_hover .table__cell {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.table__row_even .table__cell {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.table__row_hover.table__row_even .table__cell {
+    background: rgba(0, 0, 0, 0.2);
 }

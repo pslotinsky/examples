@@ -19,7 +19,7 @@ export function TableHead({ model }: IParams): JSX.Element {
                 <div className="table__rows-body">
                     <TableRow>
                         {model.map(item => (
-                            <TableCell key={item.id}>{item.name}</TableCell>
+                            <TableCell key={item.id} width={item.width}>{item.name}</TableCell>
                         ))}
                     </TableRow>
                 </div>

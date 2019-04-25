@@ -19,7 +19,7 @@ export class GroupedState extends State {
         return this.scrollerY.render(
             <React.Fragment>
                 {this.getGroups().map(item =>
-                    <TableGroup key={item.id} model={item} />
+                    <TableGroup key={item.id} model={item} scroller={this.scrollerX} />
                 )}
             </React.Fragment>
         );
