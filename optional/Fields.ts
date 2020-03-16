@@ -22,11 +22,11 @@ export class Fields {
     }
 
     public asObjectLiteral(): EntryFields {
-        return fromPairs([...this.fieldMap.entries()]);
+        return Object.fromEntries(Array.from(this.fieldMap));
     }
 
     public asFieldsDataList(): EntryFieldData[] {
-        return [...this.fieldMap.entries()].map(([name, value]) => ({ name, value }));
+        return Array.from(this.fieldMap).map(([name, value]) => ({ name, value }));
     }
 
     public getMap(): Map<FieldName, FieldValue> {
@@ -34,58 +34,47 @@ export class Fields {
     }
 
     public get(name: string): Optional<FieldValue> {
-        return Optional.ofNullable(this.fieldMap.get(name));
+        return this.fieldMap.get(name);
     }
 
     public set(name: string, value: FieldValue): void {
         this.fieldMap.set(name, value);
     }
 
-    public getArrayValueIfExists(name: string): Optional<FieldValueItem[]> {
-        return this.get(name).filter(value => isArray(value)) as Optional<FieldValueItem[]>;
+    public getArrayValue(name: string): Optional<FieldValueItem[]> {
+        const value = this.fieldMap.get(name);
+        return isArray(value) ? value : undefined;
     }
 
-    public getFieldValueItem({ id, fieldName }: ValueItemIdentity): Optional<FieldValueItem> {
-        return this.getArrayValueIfExists(fieldName).map(it => (it as FieldValueItem[]).find(it => it.id === id));
+    public getFieldValueItem({ fieldName, id }: ValueItemIdentity): Optional<FieldValueItem> {
+        return this.getArrayValue(fieldName)?.find(it => it.id === id);
     }
 
-    public getFieldValueItemOrFail({ id, fieldName }: ValueItemIdentity): FieldValueItem {
-        const fieldValueIsNotArray = () => new Error(`${fieldName} value is not an array`);
-        const itemNotExists = () => new NotFoundError({ id, entityName: 'item', endOfMessage: `not found in field: ${fieldName} values list` });
-        const value = this.getArrayValueIfExists(fieldName).orElseThrow(fieldValueIsNotArray) as FieldValueItem[];
+    public getFieldValueItemOrFail(valueItemIdentity: ValueItemIdentity): FieldValueItem {		
+        const value = this.getArrayValue(valueItemIdentity.name);
+        getOrFail(value, () => new Error(`${name} value is not an array`));
 
-        return Optional.ofNullable(value.find(it => it.id === id)).orElseThrow(itemNotExists);
+        const valueItem = this.getFieldValueItem(valueItemIdentity);
+        return getOrFail(valueItem, () => new ValueItemNotFound(valueItemIdentity));
     }
 
     private getItemsForAdding(fieldName: string, newArrayValue: FieldValueItem[]) {
-        const currentItems = this.getArrayValueIfExists(fieldName).orElse([]);
-        const isCurrentItemWithEqualIdNotExists = ({ id }: FieldValueItem) => !idsOf(currentItems).includes(id);
+        const currentItems = this.getArrayValue(fieldName) ?? [];
 
-        return newArrayValue.filter(item => isCurrentItemWithEqualIdNotExists(item));
+        return differenceBy(newArrayValue, currentItems, 'id');
     }
 
     private getChangedItems(fieldName: string, newArrayValue: FieldValueItem[]) {
-        const currentItems = this.getArrayValueIfExists(fieldName).orElse([]);
+        const currentItems = this.getArrayValueIfExists(fieldName) ?? [];
+        const newItems = newArrayValue.filter(item => !isNull(item.value));
 
-        const isCurrentItemWithEqualIdHasDifferentValue = (item: FieldValueItem) => {
-            const currentItem = currentItems.find(({ id }) => id === item.id);
-
-            return isDefined(currentItem) && !isEqual(currentItem, item) && !isNull(item.value);
-        };
-
-        return newArrayValue.filter(item => isCurrentItemWithEqualIdHasDifferentValue(item));
+        return differenceWith(newItems, currentItems, isEqual);
     }
 
     private getItemsForDeletion(fieldName: string, newArrayValue: FieldValueItem[]) {
-        const currentItems = this.getArrayValueIfExists(fieldName).orElse([]);
+        const currentItems = this.getArrayValue(fieldName) ?? [];
 
-        const isNewItemWithEqualIdHasEmptyValue = (item: FieldValueItem) => {
-            const newItem = newArrayValue.find(({ id }) => id === item.id);
-
-            return isNil(newItem) || isNull(newItem.value);
-        };
-
-        return currentItems.filter(item => isNewItemWithEqualIdHasEmptyValue(item));
+        return differenceBy(currentItems, newArrayValue, 'id');
     }
 
 }
