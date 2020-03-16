@@ -55,23 +55,20 @@ export class EntryAggregateData extends CommonEntryFieldsData {
 
     @accept(FieldValueListItemAdded)
     protected addCompositeField({ body: { fieldName, ...item } }: FieldValueListItemAdded) {
-        this.fields
-            .get(fieldName)
-            .filter(value => isArray(value))
-            .ifPresentOrElse(
-                value => this.fields.set(fieldName, [...(value as FieldValueItem[]), item]),
-                () =>  this.fields.set(fieldName, [item]),
-            );
+        const value = this.fields.get(fieldName);
+
+        isArray(value)
+            ? this.fields.set(fieldName, [...value, item])
+            : this.fields.set(fieldName, [item]);
     }
 
     @accept(FieldValueListItemDeleted)
     protected deleteCompositeField({ body: { id, fieldName } }: FieldValueListItemDeleted) {
-        this.fields
-            .getFieldValueItem({ id, fieldName })
-            .ifPresentOrElse(
-                item => item.value = null,
-                () => this.fields.set(fieldName, [{ id, value: null }]),
-            );
+        const item = this.fields.getFieldValueItem({ id, fieldName });
+
+        item
+            ? item.value = null
+            : this.fields.set(fieldName, [{ id, value: null }]);
     }
 
     @accept(FieldValueListItemChanged)

@@ -200,10 +200,7 @@ function createFieldView(name: string, value: FieldValueData, ehrData: EhrAggreg
     if (isNil(value)) {
         const ehrValue = ehrData.fields.get(name);
 
-        ehrValue.ifPresentOrElse(
-            it => newValue = { name, value: it, isDeleted: true },
-            () => newValue = value,
-        );
+        newValue = ehrValue ? { name, value: ehrValue, isDeleted: true } : value;
     }
 
     return { name, value: newValue };
